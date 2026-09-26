@@ -25,3 +25,16 @@ body{background-color:#123b2d;background-image:radial-gradient(circle at 8% 18%,
 .bauble-three{bottom:13%;left:4%;transform:scale(.7);background:radial-gradient(circle at 30% 25%,#fff7c9 0 4%,#f5dd8a 14%,#367e50 52%,#16412f 100%)}
 .bauble-four{bottom:10%;right:3%;background:radial-gradient(circle at 30% 25%,#fff7c9 0 4%,#f5dd8a 14%,#c13a40 52%,#6b1e2b 100%);transform:scale(.9)}
 @media(max-width:560px){.products .product:last-child{grid-column:auto;min-height:88px}.bauble-one{top:17%;left:-8px}.bauble-two{top:18%;right:-8px}.bauble-three{bottom:15%;left:-8px}.bauble-four{bottom:13%;right:-8px}.tinsel{height:88px}}
+
+/* Keep the item list and grand total side by side in the till footer. */
+.order-bar{min-height:clamp(92px,16vh,122px)}
+.total-button{flex-direction:row;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px}
+.total-breakdown{flex:1 1 auto;min-width:0;max-height:4.5em;align-self:center;display:flex;flex-direction:column;gap:3px;overflow-x:hidden;overflow-y:auto;text-align:left}
+.breakdown-line{display:flex;align-items:baseline;justify-content:space-between;gap:4px;min-width:0;font-size:clamp(9px,1.35vw,12px);line-height:1.25;font-variant-numeric:tabular-nums}
+.breakdown-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.breakdown-price{flex:none;font-weight:800;white-space:nowrap}
+.breakdown-empty{font-size:clamp(9px,1.35vw,12px);font-weight:700;opacity:.76}
+.total-summary{flex:none;display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+.total-value{font-size:clamp(26px,4.8vw,44px)}
+@media(max-width:560px){.order-bar{grid-template-columns:50px minmax(68px,.8fr) minmax(158px,1.8fr);gap:6px;min-height:92px}.total-button{gap:5px;padding:7px 9px}.total-value{font-size:clamp(23px,6.6vw,30px)}.total-hint{display:none}.breakdown-line,.breakdown-empty{font-size:9px}}
+@media(max-height:620px) and (orientation:landscape){.order-bar{min-height:82px;grid-template-columns:58px 1fr 1.7fr}.total-value{font-size:clamp(24px,4vw,34px)}}

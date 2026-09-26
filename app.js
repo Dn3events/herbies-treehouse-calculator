@@ -2,21 +2,53 @@
   'use strict';
   let order = [];
   const totalNode = document.getElementById('total');
+  const breakdownNode = document.getElementById('items-breakdown');
   const totalButton = document.getElementById('open-total');
   const celebration = document.getElementById('celebration');
   const celebrationTotal = document.getElementById('celebration-total');
   const mainScreen = document.getElementById('main-screen');
   const pounds = pence => `£${(pence / 100).toFixed(2)}`;
-  const sum = () => order.reduce((total, item) => total + item, 0);
+  const sum = () => order.reduce((total, item) => total + item.pence, 0);
   function render() {
     const value = pounds(sum());
     totalNode.textContent = value;
-    totalButton.setAttribute('aria-label', `Order total ${value}`);
+    totalButton.setAttribute('aria-label', `Order total ${value}; ${order.length} ${order.length === 1 ? 'item' : 'items'}`);
     celebrationTotal.textContent = value;
+    const grouped = new Map();
+    order.forEach(item => {
+      const current = grouped.get(item.name) || { count: 0, pence: 0 };
+      current.count += 1;
+      current.pence += item.pence;
+      grouped.set(item.name, current);
+    });
+    breakdownNode.replaceChildren();
+    if (grouped.size === 0) {
+      const empty = document.createElement('span');
+      empty.className = 'breakdown-empty';
+      empty.textContent = 'No items yet';
+      breakdownNode.appendChild(empty);
+    } else {
+      grouped.forEach((group, name) => {
+        const line = document.createElement('span');
+        line.className = 'breakdown-line';
+        const label = document.createElement('span');
+        label.className = 'breakdown-name';
+        label.textContent = `${group.count} × ${name}`;
+        label.title = label.textContent;
+        const subtotal = document.createElement('span');
+        subtotal.className = 'breakdown-price';
+        subtotal.textContent = pounds(group.pence);
+        line.append(label, subtotal);
+        breakdownNode.appendChild(line);
+      });
+    }
   }
   document.querySelectorAll('.product[data-pence]').forEach(button => {
     button.addEventListener('click', () => {
-      order.push(Number(button.dataset.pence));
+      order.push({
+        pence: Number(button.dataset.pence),
+        name: button.dataset.breakdown || button.querySelector('.product-name').textContent.trim()
+      });
       render();
     });
   });

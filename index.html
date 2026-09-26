@@ -24,19 +24,19 @@
       </header>
 
       <section class="products" aria-label="Add an item to the order">
-        <button class="product" data-pence="670" type="button">
+        <button class="product" data-pence="670" data-breakdown="Alcoholic drink" type="button">
           <span class="product-icon" aria-hidden="true">🍷</span><span class="product-name">Alcoholic drink</span><span class="product-price">£6.70</span>
         </button>
-        <button class="product" data-pence="470" type="button">
+        <button class="product" data-pence="470" data-breakdown="Hot drinks" type="button">
           <span class="product-icon" aria-hidden="true">☕</span><span class="product-name">Hot chocolate /<br>Mulled apple /<br>Ginger beer</span><span class="product-price">£4.70</span>
         </button>
-        <button class="product" data-pence="520" type="button">
+        <button class="product" data-pence="520" data-breakdown="Egg nog / chocolate orange" type="button">
           <span class="product-icon" aria-hidden="true">🍊</span><span class="product-name">Egg nog /<br>Chocolate orange</span><span class="product-price">£5.20</span>
         </button>
-        <button class="product" data-pence="200" type="button">
+        <button class="product" data-pence="200" data-breakdown="Shots" type="button">
           <span class="product-icon" aria-hidden="true">🥃</span><span class="product-name">Shots</span><span class="product-price">£2.00</span>
         </button>
-        <button class="product" data-pence="720" type="button">
+        <button class="product" data-pence="720" data-breakdown="Hot toddys" type="button">
           <span class="product-icon" aria-hidden="true">🍋</span><span class="product-name">Hot toddys</span><span class="product-price">£7.20</span>
         </button>
         <button class="product product-extra" type="button" aria-label="Extras, no price set">
@@ -48,7 +48,8 @@
         <button class="undo" id="undo" type="button" aria-label="Remove the most recently added item" title="Remove last item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-2"/></svg></button>
         <button class="clear-button" id="clear" type="button">Clear</button>
         <button class="total-button" id="open-total" type="button" aria-label="Order total £0.00">
-          <span class="total-label">TOTAL</span><span class="total-value" id="total">£0.00</span><span class="total-hint">Tap to celebrate ✨</span>
+          <span class="total-breakdown" id="items-breakdown" aria-label="Order items"><span class="breakdown-empty">No items yet</span></span>
+          <span class="total-summary"><span class="total-label">TOTAL</span><span class="total-value" id="total">£0.00</span><span class="total-hint">Tap to celebrate ✨</span></span>
         </button>
       </footer>
     </main>
