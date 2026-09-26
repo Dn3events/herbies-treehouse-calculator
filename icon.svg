@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+ <rect width="512" height="512" rx="112" fill="#123b2d"/>
+ <circle cx="256" cy="256" r="201" fill="#1c5941" stroke="#edc76a" stroke-width="15"/>
+ <path d="M256 90 280 158 351 130 325 201 399 225 330 256 399 287 325 311 351 382 280 354 256 422 232 354 161 382 187 311 113 287 182 256 113 225 187 201 161 130 232 158Z" fill="#edc76a"/>
+ <path d="M224 319h64v60h-64z" fill="#9a4c2f"/>
+ <path d="m256 155 31 37 43-4-27 34 13 41-40-17-40 17 13-41-27-34 43 4z" fill="#fff8df"/>
+ <text x="256" y="455" text-anchor="middle" font-family="Georgia,serif" font-size="28" font-weight="bold" fill="#fff8df" letter-spacing="4">HERBIE’S</text>
+</svg>
