@@ -1,19 +1,24 @@
 (() => {
   'use strict';
   let order = [];
+  let traderDiscount = false;
   const totalNode = document.getElementById('total');
   const breakdownNode = document.getElementById('items-breakdown');
+  const discountButton = document.getElementById('trader-discount');
   const totalButton = document.getElementById('open-total');
   const celebration = document.getElementById('celebration');
   const celebrationTotal = document.getElementById('celebration-total');
   const mainScreen = document.getElementById('main-screen');
   const pounds = pence => `£${(pence / 100).toFixed(2)}`;
   const sum = () => order.reduce((total, item) => total + item.pence, 0);
+  const discount = () => traderDiscount ? Math.round(sum() / 2) : 0;
+  const grandTotal = () => sum() - discount();
   function render() {
-    const value = pounds(sum());
+    const value = pounds(grandTotal());
     totalNode.textContent = value;
-    totalButton.setAttribute('aria-label', `Order total ${value}; ${order.length} ${order.length === 1 ? 'item' : 'items'}`);
+    totalButton.setAttribute('aria-label', `Order total ${value}; ${order.length} ${order.length === 1 ? 'item' : 'items'}${traderDiscount ? '; trader discount applied' : ''}`);
     celebrationTotal.textContent = value;
+    discountButton.setAttribute('aria-pressed', String(traderDiscount));
     const grouped = new Map();
     order.forEach(item => {
       const current = grouped.get(item.name) || { count: 0, pence: 0 };
@@ -41,6 +46,18 @@
         line.append(label, subtotal);
         breakdownNode.appendChild(line);
       });
+      if (traderDiscount) {
+        const line = document.createElement('span');
+        line.className = 'breakdown-line discount-line';
+        const label = document.createElement('span');
+        label.className = 'breakdown-name';
+        label.textContent = 'Trader 50% off';
+        const amount = document.createElement('span');
+        amount.className = 'breakdown-price';
+        amount.textContent = `−${pounds(discount())}`;
+        line.append(label, amount);
+        breakdownNode.appendChild(line);
+      }
     }
   }
   document.querySelectorAll('.product[data-pence]').forEach(button => {
@@ -53,8 +70,10 @@
     });
   });
   document.getElementById('undo').addEventListener('click', () => { order.pop(); render(); });
+  discountButton.addEventListener('click', () => { traderDiscount = !traderDiscount; render(); });
   function clearOrder() {
     order = [];
+    traderDiscount = false;
     render();
     celebration.hidden = true;
     mainScreen.inert = false;
@@ -98,7 +117,7 @@
     } catch (_) { /* Sound is a bonus; the celebration still opens if audio is unavailable. */ }
   }
   totalButton.addEventListener('click', () => {
-    if (sum() === 0) return;
+    if (grandTotal() === 0) return;
     render();
     celebration.hidden = false;
     mainScreen.inert = true;

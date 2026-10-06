@@ -1,6 +1,6 @@
 # Herbie’s Treehouse Calculator
 
-A static, installable till app for a Christmas drinks stall. It has no framework or build step, and the current order lives only in memory so a refresh always starts at £0.00. Product amounts are stored as integer pence. The running total includes an item-group breakdown, and the celebration bells are synthesized locally after the total is tapped.
+A static, installable till app for a Christmas drinks stall. It has no framework or build step, and the current order lives only in memory so a refresh always starts at £0.00. Product amounts are stored as integer pence. The running total includes an item-group breakdown, and the celebration bells are synthesized locally after the total is tapped. The Trader 50% off button toggles a discount on the whole order, including later additions; Clear resets it.
 
 ## Run locally
 

@@ -43,3 +43,14 @@ body{background-color:#123b2d;background-image:radial-gradient(circle at 8% 18%,
 @keyframes elf-dance{0%,100%{transform:translateX(-50%) rotate(-2deg) translateY(0)}25%{transform:translateX(-50%) rotate(2.5deg) translateY(-8px)}50%{transform:translateX(-50%) rotate(-1deg) translateY(1px)}75%{transform:translateX(-50%) rotate(2deg) translateY(-6px)}}
 @media(max-height:620px) and (orientation:landscape){.celebration-content{top:15%}.dancing-elves{width:min(48vw,410px);max-height:48svh;bottom:calc(48px + var(--safe-bottom))}.celebration-clear{font-size:15px;padding:11px 18px}}
 @media(prefers-reduced-motion:reduce){.dancing-elves{animation:none}}
+
+/* Trader discount stays close to the order controls and shows its active state. */
+.order-bar{grid-template-columns:58px minmax(86px,.8fr) minmax(112px,1fr) minmax(250px,2.6fr)}
+.discount-button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:56px;padding:8px 10px;border:2px solid var(--gold)!important;background:#fff5d9;color:var(--green);font-size:clamp(12px,1.7vw,16px);font-weight:800;line-height:1.1;text-align:center;box-shadow:0 5px 0 #9d7e39;cursor:pointer}
+.discount-button .discount-icon{font-size:22px;color:var(--red)}
+.discount-button[aria-pressed="true"]{background:var(--gold);border-color:#fff5cf!important;color:#15392b;box-shadow:0 5px 0 #947232,0 0 0 3px #fff9db65}
+.discount-button[aria-pressed="true"] .discount-icon{color:#9b2630}
+.discount-button:focus-visible{outline:4px solid #fff;outline-offset:3px}
+.discount-line{padding-top:2px;border-top:1px solid #96733188;color:#852b32}
+@media(max-width:560px){.products{grid-template-rows:repeat(3,minmax(92px,1fr))}.order-bar{grid-template-columns:50px minmax(78px,1fr) minmax(120px,1.35fr);grid-template-rows:minmax(56px,auto) minmax(78px,auto);gap:7px;min-height:0}.total-button{grid-column:1/-1}.total-breakdown{max-height:3.7em}.discount-button{font-size:14px}.discount-button .discount-icon{font-size:19px}}
+@media(max-height:620px) and (orientation:landscape){.order-bar{grid-template-columns:52px minmax(72px,.7fr) minmax(106px,.9fr) minmax(190px,2.4fr);grid-template-rows:1fr;min-height:78px}.total-button{grid-column:auto}.discount-button{font-size:12px;min-height:0}.discount-button .discount-icon{font-size:17px}}
