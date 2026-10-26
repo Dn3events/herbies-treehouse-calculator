@@ -1,5 +1,5 @@
-const CACHE = 'herbies-treehouse-v10';
-const APP_FILES = ['./', './index.html', './styles.css?v=9', './app.js?v=9', './manifest.webmanifest', './treehouse-logo.png', './icon.svg', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+const CACHE = 'herbies-treehouse-v12';
+const APP_FILES = ['./', './index.html', './styles.css?v=11', './app.js?v=11', './manifest.webmanifest', './treehouse-logo.png', './icon.svg', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_FILES)));
   self.skipWaiting();
