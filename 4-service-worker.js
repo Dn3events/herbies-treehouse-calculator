@@ -1,0 +1,29 @@
+const CACHE = 'herbies-treehouse-v10';
+const APP_FILES = ['./', './index.html', './styles.css?v=9', './app.js?v=9', './manifest.webmanifest', './treehouse-logo.png', './icon.svg', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_FILES)));
+  self.skipWaiting();
+});
+self.addEventListener('activate', event => {
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+  const isPage = event.request.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('/index.html');
+  if (isPage) {
+    // Pages come from the network first so updates show up on the next open;
+    // the cached copy is the offline fallback.
+    event.respondWith(fetch(event.request).then(response => {
+      if (response.ok) { const copy = response.clone(); caches.open(CACHE).then(cache => cache.put('./index.html', copy)); }
+      return response;
+    }).catch(() => caches.match('./index.html')));
+    return;
+  }
+  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
+    if (response.ok) { const copy = response.clone(); caches.open(CACHE).then(cache => cache.put(event.request, copy)); }
+    return response;
+  }).catch(() => caches.match('./index.html'))));
+});
