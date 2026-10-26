@@ -161,6 +161,16 @@
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    // Feathered hole in the fireworks around the amount so the total always reads clearly.
+    const baseBox = canvas.getBoundingClientRect();
+    const totalBox = celebrationTotal.getBoundingClientRect();
+    const cx = totalBox.left + totalBox.width / 2 - baseBox.left;
+    const cy = totalBox.top + totalBox.height / 2 - baseBox.top;
+    const rx = celebrationTotal.offsetWidth / 2 * 1.12 + 34;
+    const ry = celebrationTotal.offsetHeight / 2 * 1.1 + 34;
+    const mask = `radial-gradient(ellipse ${rx}px ${ry}px at ${cx}px ${cy}px, transparent 62%, #000 100%)`;
+    canvas.style.webkitMaskImage = mask;
+    canvas.style.maskImage = mask;
     let sparks = [];
     let last = performance.now();
     const started = last;
@@ -190,6 +200,7 @@
       ctx.fillRect(0, 0, width, height);
       ctx.globalCompositeOperation = 'lighter';
       sparks = sparks.filter(s => s.life < s.max);
+      ctx.save();
       sparks.forEach(s => {
         s.life += dt;
         s.vx *= 1 - 1.6 * dt;
@@ -204,6 +215,7 @@
         ctx.fill();
       });
       ctx.globalAlpha = 1;
+      ctx.restore();
       fxFrame = window.requestAnimationFrame(frame);
     }
     fxFrame = window.requestAnimationFrame(frame);
