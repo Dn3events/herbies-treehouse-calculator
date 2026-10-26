@@ -59,3 +59,7 @@ body{background-color:#123b2d;background-image:radial-gradient(circle at 8% 18%,
 .celebration:not([hidden]) .celebration-total{animation:total-flash 1.6s ease-out both}
 @keyframes total-flash{0%{transform:scale(.4);opacity:0;filter:brightness(2.4)}14%{transform:scale(1.18);opacity:1;filter:brightness(2.2)}28%{transform:scale(.97);filter:brightness(1.1)}42%{transform:scale(1.06);filter:brightness(1.7)}100%{transform:scale(1);filter:brightness(1)}}
 @media(prefers-reduced-motion:reduce){.celebration:not([hidden]) .celebration-total{animation:none}}
+
+.celebration-total{position:relative;z-index:3;text-shadow:0 5px 0 #8a6a1e,0 0 6px #04150f,0 0 22px #04150f,0 0 44px #04150fcc}
+.celebration-content{z-index:3}
+.fireworks-canvas{z-index:1}
