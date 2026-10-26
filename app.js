@@ -76,45 +76,146 @@
     traderDiscount = false;
     render();
     celebration.hidden = true;
+    stopFireworks();
+    stopChaChing();
     mainScreen.inert = false;
     mainScreen.removeAttribute('aria-hidden');
   }
   document.getElementById('clear').addEventListener('click', clearOrder);
   document.getElementById('celebration-clear').addEventListener('click', clearOrder);
-  function playBells() {
-    // Bright, overlapping bell partials for a short, original jingle-bells-style fanfare.
+  // Celebration: the total flashes up with fireworks and a till "cha-ching".
+  let fxCanvas = null, fxFrame = 0, fxTimer = 0, fxSound = null;
+  function playChaChing() {
+    // Synthesized till: drawer thunk + two bright bell strikes ("cha" "ching").
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
     try {
       const context = new AudioContext();
+      fxSound = context;
       const now = context.currentTime;
-      const melody = [
-        [659.25, 0], [659.25, .15], [659.25, .30], [659.25, .52],
-        [659.25, .68], [659.25, .84], [659.25, 1.08], [783.99, 1.31],
-        [523.25, 1.55], [587.33, 1.78], [659.25, 2.02], [698.46, 2.37],
-        [698.46, 2.54], [698.46, 2.72], [698.46, 2.9], [659.25, 3.08],
-        [659.25, 3.26], [659.25, 3.44], [783.99, 3.62], [783.99, 3.8],
-        [698.46, 3.98], [587.33, 4.16], [523.25, 4.34], [587.33, 4.52],
-        [783.99, 4.70]
-      ];
-      melody.forEach(([frequency, offset], index) => {
+      const master = context.createGain();
+      master.gain.value = .9;
+      master.connect(context.destination);
+      // "Cha": short filtered noise burst, like the drawer sliding open.
+      const len = Math.floor(context.sampleRate * .14);
+      const buffer = context.createBuffer(1, len, context.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
+      const noise = context.createBufferSource();
+      noise.buffer = buffer;
+      const band = context.createBiquadFilter();
+      band.type = 'bandpass'; band.frequency.value = 2600; band.Q.value = .8;
+      const noiseGain = context.createGain();
+      noiseGain.gain.value = .5;
+      noise.connect(band).connect(noiseGain).connect(master);
+      noise.start(now);
+      const thunk = context.createOscillator();
+      const thunkGain = context.createGain();
+      thunk.type = 'sine';
+      thunk.frequency.setValueAtTime(190, now);
+      thunk.frequency.exponentialRampToValueAtTime(70, now + .12);
+      thunkGain.gain.setValueAtTime(.5, now);
+      thunkGain.gain.exponentialRampToValueAtTime(.0001, now + .14);
+      thunk.connect(thunkGain).connect(master);
+      thunk.start(now); thunk.stop(now + .16);
+      // "Ching": two struck-bell notes with inharmonic partials and a long ring.
+      [[2093, .13, 1.5], [2637, .19, 1.9]].forEach(([frequency, offset, ring]) => {
         const start = now + offset;
-        // Inharmonic upper partials give each sine wave a bright, struck-bell timbre.
-        [[1, .14], [2.76, .043], [5.4, .016]].forEach(([ratio, volume]) => {
+        [[1, .22], [2.76, .09], [5.4, .04], [8.93, .018]].forEach(([ratio, volume]) => {
           const osc = context.createOscillator();
           const gain = context.createGain();
           osc.type = 'sine';
           osc.frequency.value = frequency * ratio;
           gain.gain.setValueAtTime(.0001, start);
-          gain.gain.exponentialRampToValueAtTime(volume, start + .008);
-          gain.gain.exponentialRampToValueAtTime(.0001, start + (index % 3 === 0 ? .68 : .52));
-          osc.connect(gain).connect(context.destination);
+          gain.gain.exponentialRampToValueAtTime(volume, start + .004);
+          gain.gain.exponentialRampToValueAtTime(.0001, start + ring / ratio ** .35);
+          osc.connect(gain).connect(master);
           osc.start(start);
-          osc.stop(start + .7);
+          osc.stop(start + ring + .05);
         });
       });
-      window.setTimeout(() => context.close(), 5600);
+      window.setTimeout(() => { try { context.close(); } catch (_) {} if (fxSound === context) fxSound = null; }, 3000);
     } catch (_) { /* Sound is a bonus; the celebration still opens if audio is unavailable. */ }
+  }
+  function stopChaChing() {
+    if (!fxSound) return;
+    try { fxSound.close(); } catch (_) { /* ignore */ }
+    fxSound = null;
+  }
+  const FX_COLORS = ['#ffd45a', '#ff5d5d', '#7ee08a', '#6cc3ff', '#fff4d4', '#ff9bd2', '#ffb347'];
+  function startFireworks() {
+    stopFireworks();
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!fxCanvas) {
+      fxCanvas = document.createElement('canvas');
+      fxCanvas.setAttribute('aria-hidden', 'true');
+      fxCanvas.className = 'fireworks-canvas';
+      celebration.insertBefore(fxCanvas, celebration.firstChild);
+    }
+    const canvas = fxCanvas;
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const width = canvas.clientWidth || window.innerWidth;
+    const height = canvas.clientHeight || window.innerHeight;
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    let sparks = [];
+    let last = performance.now();
+    const started = last;
+    function burst(x, y) {
+      const color = FX_COLORS[Math.floor(Math.random() * FX_COLORS.length)];
+      const alt = FX_COLORS[Math.floor(Math.random() * FX_COLORS.length)];
+      const count = 46 + Math.floor(Math.random() * 24);
+      const power = Math.min(width, height) * (.30 + Math.random() * .22);
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count + Math.random() * .12;
+        const speed = power * (.45 + Math.random() * .55);
+        sparks.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 0, max: 1.1 + Math.random() * .7, color: i % 3 === 0 ? alt : color });
+      }
+    }
+    function launch() {
+      burst(width * (.12 + Math.random() * .76), height * (.12 + Math.random() * .5));
+    }
+    // Opening salvo, then steady bursts for as long as the total is on screen.
+    burst(width * .5, height * .3);
+    [220, 420, 640].forEach(delay => window.setTimeout(launch, delay));
+    fxTimer = window.setInterval(launch, 700);
+    function frame(time) {
+      const dt = Math.min((time - last) / 1000, .05);
+      last = time;
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'rgba(0,0,0,.22)';
+      ctx.fillRect(0, 0, width, height);
+      ctx.globalCompositeOperation = 'lighter';
+      sparks = sparks.filter(s => s.life < s.max);
+      sparks.forEach(s => {
+        s.life += dt;
+        s.vx *= 1 - 1.6 * dt;
+        s.vy = s.vy * (1 - 1.6 * dt) + 150 * dt;
+        s.x += s.vx * dt;
+        s.y += s.vy * dt;
+        const fade = Math.max(0, 1 - s.life / s.max);
+        ctx.globalAlpha = fade;
+        ctx.fillStyle = s.color;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 1.2 + 2.2 * fade, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+      fxFrame = window.requestAnimationFrame(frame);
+    }
+    fxFrame = window.requestAnimationFrame(frame);
+  }
+  function stopFireworks() {
+    if (fxFrame) window.cancelAnimationFrame(fxFrame);
+    if (fxTimer) window.clearInterval(fxTimer);
+    fxFrame = 0; fxTimer = 0;
+    if (fxCanvas) {
+      const ctx = fxCanvas.getContext('2d');
+      if (ctx) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, fxCanvas.width, fxCanvas.height); }
+    }
   }
   totalButton.addEventListener('click', () => {
     if (grandTotal() === 0) return;
@@ -122,7 +223,8 @@
     celebration.hidden = false;
     mainScreen.inert = true;
     mainScreen.setAttribute('aria-hidden', 'true');
-    playBells();
+    playChaChing();
+    startFireworks();
   });
   const stars = document.querySelector('.star-field');
   for (let i = 0; i < 34; i++) {
